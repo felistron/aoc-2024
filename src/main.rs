@@ -51,6 +51,77 @@ mod day_1 {
     }
 }
 
+mod day_2 {
+    use std::str::FromStr;
+
+    fn is_safe(report: &Vec<i32>) -> bool {
+        let mut safe: bool = true;
+        let mut inc: i32 = 0;
+
+        for i in 1..report.len() {
+            let dl: i32 = report[i] - report[i - 1];
+
+            if dl.abs() < 1 || dl.abs() > 3 {
+                safe = false;
+            }
+
+            if (inc * dl) < 0 {
+                safe = false;
+            }
+
+            inc = dl;
+        }
+
+        safe
+    }
+
+    pub fn run(input: &str) {
+        println!("======== Day 2 ========");
+
+        let reports: Vec<&str> = input.split("\n").collect();
+
+        let mut safe_reports: u32 = 0;
+        let mut safe_dampener_reports: u32 = 0;
+
+        for report in reports.iter() {
+            if report.is_empty() {
+                continue;
+            }
+
+            let levels: Vec<i32> = report
+                .split(" ")
+                .map(|r| i32::from_str(r)
+                    .expect("Unreachable"))
+                .collect();
+
+            if is_safe(&levels) {
+                safe_reports += 1;
+                continue;
+            }
+
+            // part 2
+            let mut safe: bool = false;
+
+            for i in 0..levels.len() {
+                let mut levels_copy = levels.clone();
+                levels_copy.remove(i);
+
+                if is_safe(&levels_copy) {
+                    safe = true;
+                    break;
+                }
+            }
+
+            if safe {
+                safe_dampener_reports += 1;
+            }
+        }
+
+        println!("Part 1: {}", safe_reports);
+        println!("Part 2: {}", safe_reports + safe_dampener_reports);
+    }
+}
+
 fn print_aoc() {
     println!("~~~~~~~~~~~~~~~~~~~~~~~");
     println!("# Advent of code 2024 #");
@@ -83,8 +154,8 @@ fn print_aoc() {
 }
 
 fn main() {
-    let input = include_str!("../assets/input.txt");
-
     print_aoc();
-    day_1::run(input);
+
+    day_1::run(include_str!("../assets/input_d1.txt"));
+    day_2::run(include_str!("../assets/input_d2.txt"));
 }
